@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Dtos\Results\" />
-    <Folder Include="Dtos\Requests\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,10 +1,21 @@
 ﻿using GigBookingApi.Application.Dtos;
 using GigBookingApi.Application.Interfaces;
+using GigBookingApi.Infrastructure.Entities;
 
 namespace GigBookingApi.Infrastructure.Repositories;
 
 public class GigBookingRepository : IGigBookingRepository
 {
+    public async Task<GigBookingReponseModel> CreateAsync(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    {
+        var gigBooking = new GigBooking(startDate, endDate, street, streetNumber, zipCode, clientName, clientName, clientEmail, clientPhone);
+
+        //Todo: Contact database
+        var responsModel = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+
+        return responsModel;
+    }
+
     public async Task<IEnumerable<GigBookingReponseModel>> GetAllAsync()
     {
         return
