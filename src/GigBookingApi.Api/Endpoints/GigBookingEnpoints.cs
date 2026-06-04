@@ -1,4 +1,6 @@
-﻿namespace GigBookingApi.Api.Endpoints;
+﻿using GigBookingApi.Application.Interfaces;
+
+namespace GigBookingApi.Api.Endpoints;
 
 public static class GigBookingEnpoints
 {
@@ -11,8 +13,10 @@ public static class GigBookingEnpoints
         group.MapGet("/all-bookings", GetAllBookings);
     }
 
-    private static async Task<IResult> GetAllBookings()
+    private static async Task<IResult> GetAllBookings(IGigBookingService gigBookingService)
     {
-        return Results.Ok();
+        var allBookings = await gigBookingService.GetAllGigBookings();
+
+        return Results.Ok(allBookings);
     }
 }
