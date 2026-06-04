@@ -20,9 +20,9 @@ public class GigBookingRepository : IGigBookingRepository
     {
         return
         [
-            new GigBookingReponseModel("1", DateTimeOffset.Parse("2024-03-15 18:00+01:00"), DateTimeOffset.Parse("2024-03-15 23:00+01:00"), "Storgatan", "14", "11122", "Stockholm", "Anna Lindgren", "anna@email.com", "0701234567"),
-            new GigBookingReponseModel("2", DateTimeOffset.Parse("2024-04-20 19:00+02:00"), DateTimeOffset.Parse("2024-04-20 23:30+02:00"), "Kungsgatan", "5", "41101", "Göteborg", "Erik Johansson", "erik@email.com", "0709876543"),
-            new GigBookingReponseModel("3", DateTimeOffset.Parse("2024-05-01 20:00+02:00"), DateTimeOffset.Parse("2024-05-01 00:00+02:00"), "Drottninggatan", "22", "21121", "Malmö", "Sara Nilsson", "sara@email.com", "0705551234"),
+            new GigBookingReponseModel("1", DateTimeOffset.Parse("2026-07-15 18:00+02:00"), DateTimeOffset.Parse("2026-07-15 23:00+02:00"), "Storgatan", "14", "11122", "Stockholm", "Anna Lindgren", "anna@email.com", "0701234567"),
+            new GigBookingReponseModel("2", DateTimeOffset.Parse("2026-08-20 19:00+02:00"), DateTimeOffset.Parse("2026-08-20 23:30+02:00"), "Kungsgatan", "5", "41101", "Göteborg", "Erik Johansson", "erik@email.com", "0709876543"),
+            new GigBookingReponseModel("3", DateTimeOffset.Parse("2026-09-01 20:00+02:00"), DateTimeOffset.Parse("2026-09-01 23:00+02:00"), "Drottninggatan", "22", "21121", "Malmö", "Sara Nilsson", "sara@email.com", "0705551234"),
         ];
     }
 

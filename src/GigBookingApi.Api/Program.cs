@@ -1,4 +1,5 @@
 using GigBookingApi.Api.Endpoints;
+using GigBookingApi.Api.Middleware;
 using GigBookingApi.Api.OpenApi;
 using GigBookingApi.Api.Security;
 using GigBookingApi.Application.Interfaces;
@@ -16,6 +17,8 @@ builder.Services.AddScoped<IGigBookingService, GigBookingService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors("All");
 app.UseHttpsRedirection();
