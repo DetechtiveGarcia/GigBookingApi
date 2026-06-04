@@ -3,5 +3,5 @@
 namespace GigBookingApi.Application.Interfaces;
 public interface IGigBookingRepository
 {
-    public Task<IEnumerable<GigBookingModel>> GetAllAsync();
+    public Task<IEnumerable<GigBookingReponseModel>> GetAllAsync();
 }
