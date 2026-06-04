@@ -5,7 +5,7 @@ namespace GigBookingApi.Infrastructure.Repositories;
 
 public class GigBookingRepository : IGigBookingRepository
 {
-    public IEnumerable<GigBookingModel> GetAll()
+    public async Task<IEnumerable<GigBookingModel>> GetAllAsync()
     {
         return
         [
