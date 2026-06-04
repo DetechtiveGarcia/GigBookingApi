@@ -16,4 +16,9 @@
     <Folder Include="Dtos\Requests\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GigBookingApi.Application\GigBookingApi.Application.csproj" />
+    <ProjectReference Include="..\GigBookingApi.Infrastructure\GigBookingApi.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
