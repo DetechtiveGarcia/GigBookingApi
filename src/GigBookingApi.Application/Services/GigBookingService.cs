@@ -1,12 +1,13 @@
 ﻿using GigBookingApi.Application.Dtos;
 using GigBookingApi.Application.Exceptions;
 using GigBookingApi.Application.Interfaces;
+using GigBookingApi.Application.Results;
 
 namespace GigBookingApi.Application.Services;
 
 public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IGigBookingService
 {
-    public async Task<GigBookingReponseModel> CreateGigBooking(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    public async Task<Result<GigBookingReponseModel>> CreateGigBooking(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
     {
         if (startDate >= endDate)
             throw new ValidationException("Start date must be before end date");
@@ -28,14 +29,22 @@ public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IG
         if (allBookings.Any(b => startDate < b.EndDate && endDate > b.StartDate))
             throw new ConflictException("The selected time is already booked");
 
-        return await gigBookingRepo.CreateAsync(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+        var created = await gigBookingRepo.CreateAsync(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+
+
+        return Result<GigBookingReponseModel>.Success(created);
     }
 
-    public async Task<IEnumerable<GigBookingReponseModel>> GetAllGigBookings()
+    public async Task<Result<IEnumerable<GigBookingReponseModel>>> GetAllGigBookings()
     {
         var allBookings = await gigBookingRepo.GetAllAsync();
 
-        return allBookings;
+        if(allBookings is null)
+        {
+            return Result<IEnumerable<GigBookingReponseModel>>.Fail("Error in database");
+        }
+
+        return Result<IEnumerable<GigBookingReponseModel>>.Success(allBookings);
     }
 
 }
