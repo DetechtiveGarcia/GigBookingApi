@@ -5,11 +5,6 @@ namespace GigBookingApi.Infrastructure.Repositories;
 
 public class GigBookingRepository : IGigBookingRepository
 {
-    public Task<GigBookingReponseModel> FindByIdAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<IEnumerable<GigBookingReponseModel>> GetAllAsync()
     {
         return
