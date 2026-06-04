@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GigBookingApi.Application\GigBookingApi.Application.csproj" />
+  </ItemGroup>
+
 </Project>
