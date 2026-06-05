@@ -32,10 +32,10 @@ public class GigBookingRepository : IGigBookingRepository
         return validGigBookingsListResponse;
     }
 
-    public async Task<GigBookingReponseModel> UpdateAsync(string Id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    public async Task<GigBookingReponseModel> UpdateAsync(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
     {
         //Todo: await 
-        var gigBooking = _list.Find(gb => gb.Id == Id) ?? throw new NotFoundException("No gig found.");
+        var gigBooking = await FindByIdAsync(id);
         var validGigBooking = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
 
 
@@ -43,13 +43,25 @@ public class GigBookingRepository : IGigBookingRepository
 
     }
 
+    public async Task<bool> DeleteAsync(string id)
+    {
+        var gigBooking = await FindByIdAsync(id);
 
-    public async Task<GigBookingReponseModel> FindByIdAsync(string id)
+        var isDeleted = _list.Remove(gigBooking);
+        if (!isDeleted)
+            return false;
+
+        return true;
+    }
+
+
+    public async Task<GigBooking> FindByIdAsync(string id)
     {
         //Todo: await 
         var gigBooking = _list.Find(p => p.Id == id) ?? throw new NotFoundException("No gig found.");
-        var validGigBooking = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone)
-
-        return validGigBooking;
+ 
+        return gigBooking;
     }
+
+
 }

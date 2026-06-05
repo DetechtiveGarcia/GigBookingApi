@@ -1,4 +1,5 @@
-﻿using GigBookingApi.Api.Dtos.Requests;
+﻿using GigBookingApi.Api.Dtos;
+using GigBookingApi.Api.Dtos.Requests;
 using GigBookingApi.Application.Interfaces;
 
 namespace GigBookingApi.Api.Endpoints;
@@ -14,6 +15,7 @@ public static class GigBookingEnpoints
         group.MapGet("/all-bookings", GetAllBookings);
         group.MapPost("/create", CreateGigBooking);
         group.MapPut("/update", UpdateGigBooking);
+        group.MapDelete("/delete", DeleteGigBooking);
 
     }
 
@@ -45,5 +47,10 @@ public static class GigBookingEnpoints
             return Results.BadRequest(result.ErrorMessage);
 
         return Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> DeleteGigBooking(DeleteGigBookingRequest request, IGigBookingService gigBookingService)
+    {
+        return Results.Ok();
     }
 }
