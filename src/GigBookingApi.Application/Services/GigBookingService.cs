@@ -47,4 +47,25 @@ public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IG
         return Result<IEnumerable<GigBookingReponseModel>>.Success(allBookings);
     }
 
+    public async Task<Result<GigBookingReponseModel>> UpdateGigBooking(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    {
+ 
+        var gigBooking = await gigBookingRepo.UpdateAsync(id, startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+
+        if (gigBooking is null)
+            return Result<GigBookingReponseModel>.Fail("No gig found");
+
+
+
+
+
+        return Result<GigBookingReponseModel>.Success(gigBooking);
+    }
+
+    public Task<Result<GigBookingReponseModel>> FindGigBookingById(string id)
+    {
+        //Todo: await
+
+        throw new NotImplementedException();
+    }
 }

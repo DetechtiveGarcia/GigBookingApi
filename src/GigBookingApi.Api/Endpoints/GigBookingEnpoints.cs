@@ -13,6 +13,7 @@ public static class GigBookingEnpoints
 
         group.MapGet("/all-bookings", GetAllBookings);
         group.MapPost("/create", CreateGigBooking);
+        group.MapPut("/update", UpdateGigBooking);
 
     }
 
@@ -28,8 +29,21 @@ public static class GigBookingEnpoints
 
     private static async Task<IResult> CreateGigBooking(CreateGigBookingRequest request, IGigBookingService gigBookingService)
     {
-        var gigBooking = await gigBookingService.CreateGigBooking(request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
+        var result = await gigBookingService.CreateGigBooking(request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
 
-        return Results.Ok(gigBooking);
+        if (!result.Succeeded)
+            return Results.BadRequest(result.ErrorMessage);
+
+        return Results.Ok(result.Value);
+    }
+
+    private static async Task<IResult> UpdateGigBooking(UpdateGigBookingRequest request, IGigBookingService gigBookingService)
+    {
+        var result = await gigBookingService.UpdateGigBooking(request.Id, request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
+
+        if (!result.Succeeded)
+            return Results.BadRequest(result.ErrorMessage);
+
+        return Results.Ok(result.Value);
     }
 }

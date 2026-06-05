@@ -1,3 +1,3 @@
 ﻿namespace GigBookingApi.Application.Exceptions;
 
-public class NotfoundException(string message) : GigBookingException(message, 404);
+public class NotFoundException(string message) : GigBookingException(message, 404);
