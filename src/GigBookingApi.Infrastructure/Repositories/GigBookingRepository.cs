@@ -1,73 +1,82 @@
 ﻿using GigBookingApi.Application.Dtos;
 using GigBookingApi.Application.Exceptions;
 using GigBookingApi.Application.Interfaces;
+using GigBookingApi.Infrastructure.Contexts;
 using GigBookingApi.Infrastructure.Entities;
+using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace GigBookingApi.Infrastructure.Repositories;
 
-public class GigBookingRepository : IGigBookingRepository
+public class GigBookingRepository(IMongoDbContext context, IOptions<MongoDbSettings> settings) : IGigBookingRepository
 {
-    private readonly List<GigBooking> _list = [
-            new GigBooking(DateTimeOffset.Parse("2026-07-15 18:00+02:00"), DateTimeOffset.Parse("2026-07-15 23:00+02:00"), "Storgatan", "14", "11122", "Stockholm", "Anna Lindgren", "anna@email.com", "0701234567"),
-            new GigBooking(DateTimeOffset.Parse("2026-08-20 19:00+02:00"), DateTimeOffset.Parse("2026-08-20 23:30+02:00"), "Kungsgatan", "5", "41101", "Göteborg", "Erik Johansson", "erik@email.com", "0709876543"),
-            new GigBooking(DateTimeOffset.Parse("2026-09-01 20:00+02:00"), DateTimeOffset.Parse("2026-09-01 23:00+02:00"), "Drottninggatan", "22", "21121", "Malmö", "Sara Nilsson", "sara@email.com", "0705551234"),
-        ];
 
-    public async Task<GigBookingReponseModel> CreateAsync(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    private readonly IMongoCollection<GigBooking> _collection = context.GetCollection<GigBooking>(settings.Value.CollectionName);
+
+    public async Task<GigBookingDto> CreateAsync(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, CancellationToken ct)
     {
-        var gigBooking = new GigBooking(startDate, endDate, street, streetNumber, zipCode, clientName, clientName, clientEmail, clientPhone);
+        var gigBooking = new GigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
 
-        //Todo: Contact database
-        var responsModel = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+        await _collection.InsertOneAsync(gigBooking, options: null, ct);
+        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
 
-        return responsModel;
+        return gigBookingDto;
     }
 
 
-    public async Task<IEnumerable<GigBookingReponseModel>> GetAllAsync()
+    public async Task<IEnumerable<GigBookingDto>> GetAllAsync(CancellationToken ct)
     {
-        var validGigBookingsListResponse = _list.Select(g => new GigBookingReponseModel(g.Id, g.StartDate, g.EndDate, g.Street, g.StreetNumber, g.ZipCode, g.City, g.ClientName, g.ClientEmail, g.ClientPhone));
-
-
-        return validGigBookingsListResponse;
+        var allBookings = await _collection.Find(new BsonDocument()).ToListAsync(ct);
+        return allBookings.Select(g => new GigBookingDto(g.Id, g.StartDate, g.EndDate, g.Street, g.StreetNumber, g.ZipCode, g.City, g.ClientName, g.ClientEmail, g.ClientPhone));
     }
 
-    public async Task<GigBookingReponseModel> UpdateAsync(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+    public async Task<GigBookingDto> UpdateAsync(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, CancellationToken ct)
     {
-        //Todo: await 
-        var gigBooking = await FindByIdAsync(id);
+
+        var gigBooking = await FindByIdAsync(id, ct);
+
+
 
         gigBooking.UpdateGigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
 
-        var validGigBooking = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+        FilterDefinition<GigBooking> filter = Builders<GigBooking>.Filter.Eq("Id", gigBooking.Id);
 
 
-        return validGigBooking;
+
+        await _collection.ReplaceOneAsync(filter, gigBooking, cancellationToken: ct);
+
+        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+
+
+        return gigBookingDto;
 
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(string id, CancellationToken ct)
     {
-        var gigBooking = await FindByIdAsync(id);
+        var result = await _collection.DeleteOneAsync(
+            Builders<GigBooking>.Filter.Eq("Id", id), ct);
 
-        var isDeleted = _list.Remove(gigBooking);
-        if (!isDeleted)
-            return false;
+        if (result.DeletedCount == 0)
+            throw new NotFoundException("No gig found.");
 
         return true;
     }
 
 
-    public async Task<GigBooking> FindByIdAsync(string id)
+    public async Task<GigBooking> FindByIdAsync(string id, CancellationToken ct)
     {
 
         if (string.IsNullOrWhiteSpace(id))
             throw new ValidationException("Id is required");
-        //Todo: await 
-        var gigBooking = _list.Find(p => p.Id == id) ?? throw new NotFoundException("No gig found.");
- 
-        return gigBooking;
-    }
 
+        FilterDefinition<GigBooking> filter = Builders<GigBooking>.Filter.Eq("Id", id);
+
+        var gigBooking = await _collection.Find(filter).FirstOrDefaultAsync(ct) ?? throw new NotFoundException("No gig found.");
+
+        return gigBooking;
+
+    }
 
 }
