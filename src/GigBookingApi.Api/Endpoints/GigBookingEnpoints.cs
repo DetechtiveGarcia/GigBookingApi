@@ -14,8 +14,8 @@ public static class GigBookingEnpoints
 
         group.MapGet("/all-bookings", GetAllBookings);
         group.MapPost("/create", CreateGigBooking);
-        group.MapPut("/update", UpdateGigBooking);
-        group.MapDelete("/delete", DeleteGigBooking);
+        group.MapPut("/update/{id}", UpdateGigBooking);
+        group.MapDelete("/delete/{id}", DeleteGigBooking);
 
     }
 
@@ -39,18 +39,23 @@ public static class GigBookingEnpoints
         return Results.Ok(result.Value);
     }
 
-    private static async Task<IResult> UpdateGigBooking(UpdateGigBookingRequest request, IGigBookingService gigBookingService)
+    private static async Task<IResult> UpdateGigBooking(string id, UpdateGigBookingRequest request, IGigBookingService gigBookingService)
     {
-        var result = await gigBookingService.UpdateGigBooking(request.Id, request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
+        var result = await gigBookingService.UpdateGigBooking(id, request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
 
         if (!result.Succeeded)
             return Results.BadRequest(result.ErrorMessage);
 
-        return Results.Ok(result.Value);
+        return Results.Ok();
     }
 
-    private static async Task<IResult> DeleteGigBooking(DeleteGigBookingRequest request, IGigBookingService gigBookingService)
+    private static async Task<IResult> DeleteGigBooking(string id, IGigBookingService gigBookingService)
     {
+        var result = await gigBookingService.DeleteGigBooking(id);
+
+        if (!result.Succeeded)
+            return Results.Conflict();
+
         return Results.Ok();
     }
 }
