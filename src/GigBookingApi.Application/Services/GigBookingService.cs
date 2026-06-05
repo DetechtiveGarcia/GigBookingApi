@@ -55,17 +55,17 @@ public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IG
         if (gigBooking is null)
             return Result<GigBookingReponseModel>.Fail("No gig found");
 
-
-
-
-
         return Result<GigBookingReponseModel>.Success(gigBooking);
     }
 
-    public Task<Result<GigBookingReponseModel>> FindGigBookingById(string id)
+    public async Task<bool> DeleteGigBooking(string id)
     {
-        //Todo: await
+        var isDelete = await gigBookingRepo.DeleteAsync(id);
 
-        throw new NotImplementedException();
+        if (!isDelete)
+            return false;
+
+        return true;
     }
+
 }
