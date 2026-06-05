@@ -36,6 +36,9 @@ public class GigBookingRepository : IGigBookingRepository
     {
         //Todo: await 
         var gigBooking = await FindByIdAsync(id);
+
+        gigBooking.UpdateGigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+
         var validGigBooking = new GigBookingReponseModel(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
 
 
@@ -57,6 +60,9 @@ public class GigBookingRepository : IGigBookingRepository
 
     public async Task<GigBooking> FindByIdAsync(string id)
     {
+
+        if (string.IsNullOrWhiteSpace(id))
+            throw new ValidationException("Id is required");
         //Todo: await 
         var gigBooking = _list.Find(p => p.Id == id) ?? throw new NotFoundException("No gig found.");
  
