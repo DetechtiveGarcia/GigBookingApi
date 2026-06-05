@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCorsConfiguration();
 builder.Services.AddOpenApiConfiguration();
 
-builder.Services.AddScoped<IGigBookingRepository, GigBookingRepository>();
+builder.Services.AddSingleton<IGigBookingRepository, GigBookingRepository>();
 builder.Services.AddScoped<IGigBookingService, GigBookingService>();
 
 builder.Services.AddOpenApi();
