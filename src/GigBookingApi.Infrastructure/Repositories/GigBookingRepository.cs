@@ -14,12 +14,12 @@ public class GigBookingRepository(IMongoDbContext context, IOptions<MongoDbSetti
 
     private readonly IMongoCollection<GigBooking> _collection = context.GetCollection<GigBooking>(settings.Value.CollectionName);
 
-    public async Task<GigBookingDto> CreateAsync(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, CancellationToken ct)
+    public async Task<GigBookingDto> CreateAsync(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, string venue, CancellationToken ct)
     {
-        var gigBooking = new GigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+        var gigBooking = new GigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone, venue);
 
         await _collection.InsertOneAsync(gigBooking, options: null, ct);
-        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone, gigBooking.Venue);
 
         return gigBookingDto;
     }
@@ -28,17 +28,17 @@ public class GigBookingRepository(IMongoDbContext context, IOptions<MongoDbSetti
     public async Task<IEnumerable<GigBookingDto>> GetAllAsync(CancellationToken ct)
     {
         var allBookings = await _collection.Find(new BsonDocument()).ToListAsync(ct);
-        return allBookings.Select(g => new GigBookingDto(g.Id, g.StartDate, g.EndDate, g.Street, g.StreetNumber, g.ZipCode, g.City, g.ClientName, g.ClientEmail, g.ClientPhone));
+        return allBookings.Select(g => new GigBookingDto(g.Id, g.StartDate, g.EndDate, g.Street, g.StreetNumber, g.ZipCode, g.City, g.ClientName, g.ClientEmail, g.ClientPhone, g.Venue));
     }
 
-    public async Task<GigBookingDto> UpdateAsync(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, CancellationToken ct)
+    public async Task<GigBookingDto> UpdateAsync(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, string venue, CancellationToken ct)
     {
 
         var gigBooking = await FindByIdAsync(id, ct);
 
 
 
-        gigBooking.UpdateGigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone);
+        gigBooking.UpdateGigBooking(startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone, venue);
 
         FilterDefinition<GigBooking> filter = Builders<GigBooking>.Filter.Eq("Id", gigBooking.Id);
 
@@ -46,7 +46,7 @@ public class GigBookingRepository(IMongoDbContext context, IOptions<MongoDbSetti
 
         await _collection.ReplaceOneAsync(filter, gigBooking, cancellationToken: ct);
 
-        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone);
+        var gigBookingDto = new GigBookingDto(gigBooking.Id, gigBooking.StartDate, gigBooking.EndDate, gigBooking.Street, gigBooking.StreetNumber, gigBooking.ZipCode, gigBooking.City, gigBooking.ClientName, gigBooking.ClientEmail, gigBooking.ClientPhone, gigBooking.Venue);
 
 
         return gigBookingDto;

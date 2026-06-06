@@ -31,7 +31,7 @@ public static class GigBookingEnpoints
 
     private static async Task<IResult> CreateGigBooking(CreateGigBookingRequest request, IGigBookingService gigBookingService)
     {
-        var result = await gigBookingService.CreateGigBooking(request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
+        var result = await gigBookingService.CreateGigBooking(request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone, request.Venue);
 
         if (!result.Succeeded)
             return Results.BadRequest(result.ErrorMessage);
@@ -41,7 +41,7 @@ public static class GigBookingEnpoints
 
     private static async Task<IResult> UpdateGigBooking(string id, UpdateGigBookingRequest request, IGigBookingService gigBookingService)
     {
-        var result = await gigBookingService.UpdateGigBooking(id, request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone);
+        var result = await gigBookingService.UpdateGigBooking(id, request.StartDate, request.EndDate, request.Street, request.StreetNumber, request.ZipCode, request.City, request.ClientName, request.ClientEmail, request.ClientPhone, request.Venue);
 
         if (!result.Succeeded)
             return Results.BadRequest(result.ErrorMessage);

@@ -1,6 +1,6 @@
 ﻿namespace GigBookingApi.Infrastructure.Entities;
 
-public sealed class GigBooking(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone)
+public sealed class GigBooking(DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, string venue)
 {
     public string Id { get; init; } = Guid.NewGuid().ToString();
     public DateTimeOffset StartDate { get; private set; } = startDate;
@@ -12,8 +12,9 @@ public sealed class GigBooking(DateTimeOffset startDate, DateTimeOffset endDate,
     public string ClientName { get; private set; } = clientName;
     public string ClientEmail { get; private set; } = clientEmail;
     public string ClientPhone { get; private set; } = clientPhone;
+    public string Venue { get; private set; } = venue;
 
-    public void UpdateGigBooking(DateTimeOffset? startDate, DateTimeOffset? endDate, string? street, string? streetNumber, string? zipCode, string? city, string? clientName, string? clientEmail, string? clientPhone)
+    public void UpdateGigBooking(DateTimeOffset? startDate, DateTimeOffset? endDate, string? street, string? streetNumber, string? zipCode, string? city, string? clientName, string? clientEmail, string? clientPhone, string venue)
     {
         StartDate = startDate ?? StartDate;
         EndDate = endDate ?? EndDate;
@@ -24,5 +25,6 @@ public sealed class GigBooking(DateTimeOffset startDate, DateTimeOffset endDate,
         ClientName = clientName ?? ClientName;
         ClientEmail = clientEmail ?? ClientEmail;
         ClientPhone = clientPhone ?? ClientPhone;
+        Venue = venue ?? Venue;
     }
 }
