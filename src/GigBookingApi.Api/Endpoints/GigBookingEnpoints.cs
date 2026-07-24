@@ -46,7 +46,7 @@ public static class GigBookingEnpoints
         if (!result.Succeeded)
             return Results.BadRequest(result.ErrorMessage);
 
-        return Results.Ok();
+        return Results.Ok(result.Value);
     }
 
     private static async Task<IResult> DeleteGigBooking(string id, IGigBookingService gigBookingService)

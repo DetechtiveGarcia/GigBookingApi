@@ -48,7 +48,7 @@ public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IG
         return Result<IEnumerable<GigBookingDto>>.Success(allBookings);
     }
 
-    public async Task<Result> UpdateGigBooking(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, string venue, CancellationToken ct)
+    public async Task<Result<GigBookingDto>> UpdateGigBooking(string id, DateTimeOffset startDate, DateTimeOffset endDate, string street, string streetNumber, string zipCode, string city, string clientName, string clientEmail, string clientPhone, string venue, CancellationToken ct)
     {
         if (startDate >= endDate)
             throw new ValidationException("Start date must be before end date");
@@ -75,9 +75,9 @@ public sealed class GigBookingService(IGigBookingRepository gigBookingRepo) : IG
         var created = await gigBookingRepo.UpdateAsync(id, startDate, endDate, street, streetNumber, zipCode, city, clientName, clientEmail, clientPhone, venue, ct);
 
         if (created is null)
-            return Result.Fail("No gig found");
+            return Result<GigBookingDto>.Fail("No gig found");
 
-        return Result.Success();
+        return Result<GigBookingDto>.Success(created);
     }
 
     public async Task<Result> DeleteGigBooking(string id, CancellationToken ct)
