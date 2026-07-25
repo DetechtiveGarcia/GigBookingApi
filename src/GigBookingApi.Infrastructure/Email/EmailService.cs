@@ -1,40 +1,46 @@
-﻿using Azure.Communication.Email;
+﻿using Azure;
+using Azure.Communication.Email;
 using GigBookingApi.Application.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-
 namespace GigBookingApi.Infrastructure.Email;
+
 public class EmailService : IEmailService
 {
     private readonly EmailClient _emailClient;
-    private readonly string _from;
+    private readonly EmailSettings _settings;
 
     public EmailService(
         IOptions<EmailSettings> emailSettings,
-        IConfiguration configuration)
+        EmailClient emailClient)
     {
-        _from = emailSettings.Value.From;
-
-        var connectionString = configuration["CommunicationServices:ConnectionString"];
-
-        _emailClient = new EmailClient(connectionString);
+        _settings = emailSettings.Value;
+        _emailClient = emailClient;
     }
 
-    public async Task SendBookingConfirmationAsync(string to, string subject, string htmlBody, CancellationToken ct)
+    public async Task SendEmailAsync(string to, string subject, string htmlBody, CancellationToken ct = default)
     {
-        var emailContent = new EmailContent(subject)
+        var emailContent = new EmailContent(subject) { Html = htmlBody };
+        var message = new EmailMessage(_settings.From, to, emailContent);
+
+        try
         {
-            Html = htmlBody
-        };
-
-        var recipients = new EmailRecipients(new[]
+            await _emailClient.SendAsync(WaitUntil.Started, message, ct);
+        }
+        catch (Exception ex)
         {
-            new EmailAddress(to)
-        });
+            Console.WriteLine($"Kunde inte skicka mail till {to}: {ex.Message}");
+        }
+    }
 
-        var message = new EmailMessage(_from, recipients, emailContent);
+    public async Task SendAdminNotificationAsync(string subject, string htmlBody, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(_settings.AdminEmail))
+        {
+            Console.WriteLine("AdminEmail saknas i konfigurationen.");
+            return;
+        }
 
-        await _emailClient.SendAsync(Azure.WaitUntil.Completed, message, ct);
+        await SendEmailAsync(_settings.AdminEmail, subject, htmlBody, ct);
     }
 }
