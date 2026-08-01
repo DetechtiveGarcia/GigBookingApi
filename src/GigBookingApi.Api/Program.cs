@@ -16,8 +16,7 @@ builder.Services.AddCorsConfiguration();
 builder.Services.AddOpenApiConfiguration();
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.AddSingleton(x =>
-    new EmailClient(builder.Configuration["CommunicationServices:ConnectionString"]));
+builder.Services.AddSingleton(x => new EmailClient(builder.Configuration["CommunicationServices:ConnectionString"]));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IGigBookingRepository, GigBookingRepository>();
